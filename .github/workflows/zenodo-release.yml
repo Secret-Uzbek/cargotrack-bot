@@ -1,0 +1,17 @@
+name: Zenodo Release
+
+on:
+  release:
+    types: [published]
+  workflow_dispatch:
+
+jobs:
+  zenodo:
+    if: ${{ secrets.ZENODO_TOKEN != '' }}
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Prepare Zenodo sync
+        run: |
+          test -f CITATION.cff
+          echo "Zenodo token present; ready for repository DOI synchronization."

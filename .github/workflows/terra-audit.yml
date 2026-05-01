@@ -1,0 +1,17 @@
+name: Terra Audit
+
+on:
+  workflow_dispatch:
+  push:
+    branches: [main]
+
+jobs:
+  audit:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Check core repository files
+        run: |
+          test -f README.md
+          test -f CITATION.cff
+          echo "Basic Terra audit checks passed."
