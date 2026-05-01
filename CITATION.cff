@@ -1,0 +1,18 @@
+cff-version: 1.2.0
+message: "If you use or quote this implementation utility layer, please cite it as below."
+type: software
+title: "cargotrack-bot"
+authors:
+  - family-names: Abdukarimov
+    given-names: Abdurashid
+    orcid: "https://orcid.org/0009-0000-6394-4912"
+    affiliation: "Fractal Metascience Foundation, Tashkent"
+repository-code: "https://github.com/Secret-Uzbek/cargotrack-bot"
+abstract: "Implementation utility branch for cargo tracking and Telegram bot interaction."
+keywords:
+  - cargo
+  - telegram-bot
+  - utility
+  - implementation
+license: CC0-1.0
+version: "1.0.0"
