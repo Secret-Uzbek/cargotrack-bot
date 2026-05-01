@@ -1,22 +1,74 @@
-name: Release and Publish
+name: release-and-publish
 
 on:
   push:
     tags:
-      - 'v*'
+      - "v*"
+  workflow_dispatch:
+    inputs:
+      tag_name:
+        description: "Release tag, for example v1.0.1"
+        required: true
+      release_name:
+        description: "Optional human-readable release title"
+        required: false
 
 permissions:
   contents: write
 
 jobs:
-  release:
+  build_release:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
-      - name: Create release bundle
+        with:
+          fetch-depth: 0
+
+      - name: Resolve release metadata
+        id: meta
+        shell: bash
         run: |
-          zip -r cargotrack-bot-${GITHUB_REF_NAME}.zip . -x ".git/*" ".github/*"
+          set -euo pipefail
+          if [ "${{ github.event_name }}" = "workflow_dispatch" ]; then
+            TAG="${{ github.event.inputs.tag_name }}"
+            NAME="${{ github.event.inputs.release_name }}"
+          else
+            TAG="${GITHUB_REF_NAME}"
+            NAME=""
+          fi
+
+          if [ -z "$TAG" ]; then
+            echo "No tag supplied." >&2
+            exit 1
+          fi
+
+          if [ -z "$NAME" ]; then
+            NAME="${GITHUB_REPOSITORY#*/} ${TAG}"
+          fi
+
+          echo "tag=$TAG" >> "$GITHUB_OUTPUT"
+          echo "name=$NAME" >> "$GITHUB_OUTPUT"
+
+      - name: Create release bundle
+        shell: bash
+        run: |
+          set -euo pipefail
+          REPO_NAME="${GITHUB_REPOSITORY#*/}"
+          TAG_NAME="${{ steps.meta.outputs.tag }}"
+          mkdir -p release
+          zip -r "release/${REPO_NAME}-${TAG_NAME}.zip" . -x ".git/*" -x "release/*"
+          sha256sum "release/${REPO_NAME}-${TAG_NAME}.zip" > "release/CHECKSUMS.txt"
+
       - name: Publish GitHub release
         uses: softprops/action-gh-release@v2
         with:
-          files: cargotrack-bot-${{ github.ref_name }}.zip
+          tag_name: ${{ steps.meta.outputs.tag }}
+          name: ${{ steps.meta.outputs.name }}
+          target_commitish: ${{ github.sha }}
+          files: |
+            release/${{ github.event.repository.name }}-${{ steps.meta.outputs.tag }}.zip
+            release/CHECKSUMS.txt
+
+      - name: Summary
+        run: |
+          echo "Release bundle created for ${{ github.repository }} ${{ steps.meta.outputs.tag }}" >> "$GITHUB_STEP_SUMMARY"

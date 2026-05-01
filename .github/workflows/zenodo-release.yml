@@ -1,17 +1,127 @@
-name: Zenodo Release
+name: Zenodo DOI Registration
 
 on:
   release:
     types: [published]
   workflow_dispatch:
 
+concurrency:
+  group: zenodo-${{ github.repository }}-${{ github.event.release.tag_name || github.run_id }}
+  cancel-in-progress: false
+
 jobs:
-  zenodo:
-    if: ${{ secrets.ZENODO_TOKEN != '' }}
+  register-doi:
     runs-on: ubuntu-latest
+    permissions:
+      contents: write
+
     steps:
-      - uses: actions/checkout@v4
-      - name: Prepare Zenodo sync
+      - name: Checkout
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Wait for Zenodo webhook
+        if: ${{ github.event_name == 'release' }}
+        run: sleep 90
+
+      - name: Poll Zenodo for DOI
+        id: zenodo
+        shell: bash
         run: |
-          test -f CITATION.cff
-          echo "Zenodo token present; ready for repository DOI synchronization."
+          set -euo pipefail
+          REPO_URL="https://github.com/${{ github.repository }}"
+          echo "Searching Zenodo for: $REPO_URL"
+
+          for attempt in 1 2 3 4 5; do
+            echo "Attempt $attempt..."
+            RESPONSE=$(curl -fsSL "https://zenodo.org/api/records?q=related_identifier:$REPO_URL&sort=mostrecent&size=1" || echo "")
+            DOI=$(printf "%s" "$RESPONSE" | python3 - <<'PY'
+import json
+import sys
+
+payload = sys.stdin.read().strip()
+if not payload:
+    raise SystemExit(0)
+
+try:
+    data = json.loads(payload)
+except Exception:
+    raise SystemExit(0)
+
+hits = data.get("hits", {}).get("hits", [])
+if hits:
+    doi = hits[0].get("doi") or hits[0].get("metadata", {}).get("doi", "")
+    if doi:
+        print(doi)
+PY
+)
+
+            if [ -n "$DOI" ]; then
+              echo "doi=$DOI" >> "$GITHUB_OUTPUT"
+              echo "Found DOI: $DOI"
+              exit 0
+            fi
+
+            echo "DOI not found yet, waiting 60s..."
+            sleep 60
+          done
+
+          echo "Zenodo DOI not found after polling window." >> "$GITHUB_STEP_SUMMARY"
+
+      - name: Update CITATION.cff
+        if: steps.zenodo.outputs.doi != ''
+        shell: bash
+        run: |
+          set -euo pipefail
+          DOI="${{ steps.zenodo.outputs.doi }}"
+          VERSION="${{ github.event.release.tag_name || github.ref_name }}"
+          DATE=$(date +%Y-%m-%d)
+
+          python3 - <<'PY' "$DOI" "$VERSION" "$DATE" "${{ github.repository }}"
+import pathlib
+import re
+import sys
+
+doi, version, date, repo = sys.argv[1:]
+path = pathlib.Path("CITATION.cff")
+
+if path.exists():
+    content = path.read_text(encoding="utf-8")
+else:
+    content = f'''cff-version: 1.2.0
+message: "If you use this software, please cite it as below."
+type: software
+title: "{repo.split('/')[-1]}"
+repository-code: "https://github.com/{repo}"
+url: "https://github.com/{repo}"
+'''
+
+updates = {
+    "doi": doi,
+    "version": version,
+    "date-released": date,
+}
+
+for key, value in updates.items():
+    pattern = rf"^(#\s*)?{re.escape(key)}:.*$"
+    if re.search(pattern, content, flags=re.MULTILINE):
+        content = re.sub(pattern, f"{key}: {value}", content, flags=re.MULTILINE)
+    else:
+        if not content.endswith("\\n"):
+            content += "\\n"
+        content += f"{key}: {value}\\n"
+
+path.write_text(content, encoding="utf-8")
+PY
+
+      - name: Commit CITATION.cff
+        if: steps.zenodo.outputs.doi != ''
+        shell: bash
+        run: |
+          set -euo pipefail
+          git config user.name "github-actions[bot]"
+          git config user.email "github-actions[bot]@users.noreply.github.com"
+          git add CITATION.cff
+          git diff --staged --quiet || git commit -m "chore: update CITATION.cff with DOI ${{ steps.zenodo.outputs.doi }}"
+          git push
