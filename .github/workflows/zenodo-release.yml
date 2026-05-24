@@ -31,15 +31,54 @@ jobs:
         run: |
           set -euo pipefail
           REPO_URL="https://github.com/${{ github.repository }}"
-          echo "Searching Zenodo for: $REPO_URL"
+          REPO_NAME="${{ github.repository }}"
+          echo "Searching Zenodo for repository base: $REPO_URL"
+
+          DOI=$(python3 - <<'PY' "$REPO_NAME"
+import sys
+
+repo = sys.argv[1]
+preferred = {
+    "AIUZ-Terra-Codex-EcoSystem/AIUZ-Terra-Ecosystem": "10.5281/zenodo.18860027",
+    "AIUZ-Terra-Codex-EcoSystem/Nullo-PLT-FMP-Theory": "10.5281/zenodo.19189085",
+    "AIUZ-Terra-Codex-EcoSystem/github": "10.5281/zenodo.18860023",
+    "AIUZ-Terra-Codex-EcoSystem/terra-legal": "10.5281/zenodo.18860025",
+    "Secret-Uzbek/AIUZ": "10.5281/zenodo.18860029",
+    "Secret-Uzbek/AIUZ-Terra-codex": "10.5281/zenodo.18860223",
+    "Secret-Uzbek/AIUZ-terra-codex-FMP": "10.5281/zenodo.18860225",
+    "Secret-Uzbek/FMP-CENTRAL-REPO": "10.5281/zenodo.17731795",
+    "Secret-Uzbek/FMP-Full-Publication-Package": "10.5281/zenodo.19189042",
+    "Secret-Uzbek/FMP-monograph": "10.5281/zenodo.17598953",
+    "Secret-Uzbek/Theory-of-fractal-metascience-paradigm": "10.5281/zenodo.18860033",
+    "Secret-Uzbek/Uzbek-mining": "10.5281/zenodo.18860031",
+    "Secret-Uzbek/babur-terra-codex": "10.5281/zenodo.18780897",
+    "Secret-Uzbek/navoiy-terra-corpus": "10.5281/zenodo.18676066",
+    "Secret-Uzbek/terra-fmp-research-pipeline": "10.5281/zenodo.18061978",
+    "Secret-Uzbek/terra-translation-api": "10.5281/zenodo.18860037",
+    "Secret-Uzbek/terra-ust-autobuild": "10.5281/zenodo.18860035",
+    "Secret-Uzbek/ust-mvp": "10.5281/zenodo.18860041",
+    "Secret-Uzbek/women-made-central-asia": "10.5281/zenodo.19188951",
+    "Secret-Uzbek/women-made-central-asia-corpus": "10.5281/zenodo.19188970",
+    "Secret-Uzbek/ziyarat-terra-corpus": "10.5281/zenodo.19187958",
+}
+print(preferred.get(repo, ""))
+PY
+)
+
+          if [ -n "$DOI" ]; then
+            echo "doi=$DOI" >> "$GITHUB_OUTPUT"
+            echo "Using preferred DOI from ORCID/DataCite mapping: $DOI"
+            exit 0
+          fi
 
           for attempt in 1 2 3 4 5; do
             echo "Attempt $attempt..."
-            RESPONSE=$(curl -fsSL "https://zenodo.org/api/records?q=related_identifier:$REPO_URL&sort=mostrecent&size=1" || echo "")
-            DOI=$(printf "%s" "$RESPONSE" | python3 - <<'PY'
+            RESPONSE=$(curl -fsSL "https://zenodo.org/api/records?q=$REPO_URL&sort=mostrecent&size=25" || echo "")
+            DOI=$(printf "%s" "$RESPONSE" | python3 - <<'PY' "$REPO_URL"
 import json
 import sys
 
+repo_url = sys.argv[1]
 payload = sys.stdin.read().strip()
 if not payload:
     raise SystemExit(0)
@@ -50,10 +89,15 @@ except Exception:
     raise SystemExit(0)
 
 hits = data.get("hits", {}).get("hits", [])
-if hits:
-    doi = hits[0].get("doi") or hits[0].get("metadata", {}).get("doi", "")
-    if doi:
-        print(doi)
+for hit in hits:
+    related = hit.get("metadata", {}).get("related_identifiers", []) or []
+    for item in related:
+        identifier = item.get("identifier", "") or ""
+        if identifier.startswith(repo_url):
+            doi = hit.get("doi") or hit.get("metadata", {}).get("doi", "")
+            if doi:
+                print(doi)
+                raise SystemExit(0)
 PY
 )
 
@@ -101,6 +145,7 @@ updates = {
     "doi": doi,
     "version": version,
     "date-released": date,
+    "url": f"https://doi.org/{doi}",
 }
 
 for key, value in updates.items():
