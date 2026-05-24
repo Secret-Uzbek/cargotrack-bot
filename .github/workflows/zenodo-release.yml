@@ -1,172 +1,122 @@
-name: Zenodo DOI Registration
+name: zenodo-release
 
 on:
-  release:
-    types: [published]
   workflow_dispatch:
+    inputs:
+      zenodo_doi:
+        description: "Zenodo DOI to write into CITATION.cff"
+        required: false
+        type: string
+      release_version:
+        description: "Optional version string to write into CITATION.cff"
+        required: false
+        type: string
+
+permissions:
+  contents: write
 
 concurrency:
-  group: zenodo-${{ github.repository }}-${{ github.event.release.tag_name || github.run_id }}
+  group: zenodo-${{ github.repository }}
   cancel-in-progress: false
 
 jobs:
-  register-doi:
+  update-citation:
     runs-on: ubuntu-latest
-    permissions:
-      contents: write
-
     steps:
       - name: Checkout
         uses: actions/checkout@v4
         with:
           fetch-depth: 0
 
-      - name: Wait for Zenodo webhook
-        if: ${{ github.event_name == 'release' }}
-        run: sleep 90
-
-      - name: Poll Zenodo for DOI
-        id: zenodo
+      - name: Resolve metadata
+        id: meta
         shell: bash
+        env:
+          DOI_INPUT: ${{ inputs.zenodo_doi }}
+          VERSION_INPUT: ${{ inputs.release_version }}
         run: |
           set -euo pipefail
-          REPO_URL="https://github.com/${{ github.repository }}"
-          REPO_NAME="${{ github.repository }}"
-          echo "Searching Zenodo for repository base: $REPO_URL"
 
-          DOI=$(python3 - <<'PY' "$REPO_NAME"
-import sys
+          current_doi="$(sed -n 's/^doi:[[:space:]]*//p' CITATION.cff | head -n 1 | tr -d '\"')"
+          current_version="$(sed -n 's/^version:[[:space:]]*//p' CITATION.cff | head -n 1 | tr -d '\"')"
+          today="$(date +%Y-%m-%d)"
 
-repo = sys.argv[1]
-preferred = {
-    "AIUZ-Terra-Codex-EcoSystem/AIUZ-Terra-Ecosystem": "10.5281/zenodo.18860027",
-    "AIUZ-Terra-Codex-EcoSystem/Nullo-PLT-FMP-Theory": "10.5281/zenodo.19189085",
-    "AIUZ-Terra-Codex-EcoSystem/github": "10.5281/zenodo.18860023",
-    "AIUZ-Terra-Codex-EcoSystem/terra-legal": "10.5281/zenodo.18860025",
-    "Secret-Uzbek/AIUZ": "10.5281/zenodo.18860029",
-    "Secret-Uzbek/AIUZ-Terra-codex": "10.5281/zenodo.18860223",
-    "Secret-Uzbek/AIUZ-terra-codex-FMP": "10.5281/zenodo.18860225",
-    "Secret-Uzbek/FMP-CENTRAL-REPO": "10.5281/zenodo.17731795",
-    "Secret-Uzbek/FMP-Full-Publication-Package": "10.5281/zenodo.19189042",
-    "Secret-Uzbek/FMP-monograph": "10.5281/zenodo.17598953",
-    "Secret-Uzbek/Theory-of-fractal-metascience-paradigm": "10.5281/zenodo.18860033",
-    "Secret-Uzbek/Uzbek-mining": "10.5281/zenodo.18860031",
-    "Secret-Uzbek/babur-terra-codex": "10.5281/zenodo.18780897",
-    "Secret-Uzbek/navoiy-terra-corpus": "10.5281/zenodo.18676066",
-    "Secret-Uzbek/terra-fmp-research-pipeline": "10.5281/zenodo.18061978",
-    "Secret-Uzbek/terra-translation-api": "10.5281/zenodo.18860037",
-    "Secret-Uzbek/terra-ust-autobuild": "10.5281/zenodo.18860035",
-    "Secret-Uzbek/ust-mvp": "10.5281/zenodo.18860041",
-    "Secret-Uzbek/women-made-central-asia": "10.5281/zenodo.19188951",
-    "Secret-Uzbek/women-made-central-asia-corpus": "10.5281/zenodo.19188970",
-    "Secret-Uzbek/ziyarat-terra-corpus": "10.5281/zenodo.19187958",
-}
-print(preferred.get(repo, ""))
-PY
-)
+          doi="${DOI_INPUT:-$current_doi}"
+          version="${VERSION_INPUT:-$current_version}"
 
-          if [ -n "$DOI" ]; then
-            echo "doi=$DOI" >> "$GITHUB_OUTPUT"
-            echo "Using preferred DOI from ORCID/DataCite mapping: $DOI"
-            exit 0
+          if [ -z "$doi" ]; then
+            echo "No DOI available. Supply workflow input zenodo_doi or add doi to CITATION.cff." >&2
+            exit 1
           fi
 
-          for attempt in 1 2 3 4 5; do
-            echo "Attempt $attempt..."
-            RESPONSE=$(curl -fsSL "https://zenodo.org/api/records?q=$REPO_URL&sort=mostrecent&size=25" || echo "")
-            DOI=$(printf "%s" "$RESPONSE" | python3 - <<'PY' "$REPO_URL"
-import json
-import sys
+          if [ -z "$version" ]; then
+            version="${GITHUB_REF_NAME:-manual}"
+          fi
 
-repo_url = sys.argv[1]
-payload = sys.stdin.read().strip()
-if not payload:
-    raise SystemExit(0)
+          {
+            echo "doi=$doi"
+            echo "version=$version"
+            echo "today=$today"
+          } >> "$GITHUB_OUTPUT"
 
-try:
-    data = json.loads(payload)
-except Exception:
-    raise SystemExit(0)
-
-hits = data.get("hits", {}).get("hits", [])
-for hit in hits:
-    related = hit.get("metadata", {}).get("related_identifiers", []) or []
-    for item in related:
-        identifier = item.get("identifier", "") or ""
-        if identifier.startswith(repo_url):
-            doi = hit.get("doi") or hit.get("metadata", {}).get("doi", "")
-            if doi:
-                print(doi)
-                raise SystemExit(0)
-PY
-)
-
-            if [ -n "$DOI" ]; then
-              echo "doi=$DOI" >> "$GITHUB_OUTPUT"
-              echo "Found DOI: $DOI"
-              exit 0
-            fi
-
-            echo "DOI not found yet, waiting 60s..."
-            sleep 60
-          done
-
-          echo "Zenodo DOI not found after polling window." >> "$GITHUB_STEP_SUMMARY"
-
-      - name: Update CITATION.cff
-        if: steps.zenodo.outputs.doi != ''
+      - name: Normalize CITATION.cff
         shell: bash
+        env:
+          DOI: ${{ steps.meta.outputs.doi }}
+          VERSION: ${{ steps.meta.outputs.version }}
+          TODAY: ${{ steps.meta.outputs.today }}
+          REPOSITORY_CODE: https://github.com/${{ github.repository }}
         run: |
           set -euo pipefail
-          DOI="${{ steps.zenodo.outputs.doi }}"
-          VERSION="${{ github.event.release.tag_name || github.ref_name }}"
-          DATE=$(date +%Y-%m-%d)
+          python3 <<'PY'
+          import os
+          import pathlib
+          import re
 
-          python3 - <<'PY' "$DOI" "$VERSION" "$DATE" "${{ github.repository }}"
-import pathlib
-import re
-import sys
+          path = pathlib.Path("CITATION.cff")
+          content = path.read_text(encoding="utf-8")
 
-doi, version, date, repo = sys.argv[1:]
-path = pathlib.Path("CITATION.cff")
+          updates = {
+              "doi": f"\"{os.environ['DOI']}\"",
+              "url": f"\"https://doi.org/{os.environ['DOI']}\"",
+              "version": f"\"{os.environ['VERSION']}\"",
+              "date-released": f"\"{os.environ['TODAY']}\"",
+              "repository-code": f"\"{os.environ['REPOSITORY_CODE']}\"",
+          }
 
-if path.exists():
-    content = path.read_text(encoding="utf-8")
-else:
-    content = f'''cff-version: 1.2.0
-message: "If you use this software, please cite it as below."
-type: software
-title: "{repo.split('/')[-1]}"
-repository-code: "https://github.com/{repo}"
-url: "https://github.com/{repo}"
-'''
+          for key, value in updates.items():
+              pattern = rf"^{re.escape(key)}:.*$"
+              if re.search(pattern, content, flags=re.MULTILINE):
+                  content = re.sub(pattern, f"{key}: {value}", content, flags=re.MULTILINE)
+              else:
+                  if not content.endswith("\n"):
+                      content += "\n"
+                  content += f"{key}: {value}\n"
 
-updates = {
-    "doi": doi,
-    "version": version,
-    "date-released": date,
-    "url": f"https://doi.org/{doi}",
-}
+          path.write_text(content, encoding="utf-8")
+          PY
 
-for key, value in updates.items():
-    pattern = rf"^(#\s*)?{re.escape(key)}:.*$"
-    if re.search(pattern, content, flags=re.MULTILINE):
-        content = re.sub(pattern, f"{key}: {value}", content, flags=re.MULTILINE)
-    else:
-        if not content.endswith("\\n"):
-            content += "\\n"
-        content += f"{key}: {value}\\n"
-
-path.write_text(content, encoding="utf-8")
-PY
-
-      - name: Commit CITATION.cff
-        if: steps.zenodo.outputs.doi != ''
+      - name: Commit CITATION.cff if changed
         shell: bash
+        env:
+          DOI: ${{ steps.meta.outputs.doi }}
         run: |
           set -euo pipefail
           git config user.name "github-actions[bot]"
           git config user.email "github-actions[bot]@users.noreply.github.com"
           git add CITATION.cff
-          git diff --staged --quiet || git commit -m "chore: update CITATION.cff with DOI ${{ steps.zenodo.outputs.doi }}"
-          git push
+          if ! git diff --staged --quiet; then
+            git commit -m "chore: sync CITATION.cff with Zenodo DOI ${DOI}"
+            git push
+          fi
+
+      - name: Summary
+        shell: bash
+        run: |
+          {
+            echo "## Zenodo release sync"
+            echo "- Repository: \`${{ github.repository }}\`"
+            echo "- DOI: \`${{ steps.meta.outputs.doi }}\`"
+            echo "- Version: \`${{ steps.meta.outputs.version }}\`"
+            echo "- Date released: \`${{ steps.meta.outputs.today }}\`"
+          } >> "$GITHUB_STEP_SUMMARY"
