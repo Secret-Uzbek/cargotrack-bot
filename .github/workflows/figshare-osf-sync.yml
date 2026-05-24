@@ -1,0 +1,231 @@
+name: figshare-osf-sync
+
+on:
+  workflow_dispatch:
+    inputs:
+      sync_mode:
+        description: "dry_run, figshare, osf, or both"
+        required: false
+        default: dry_run
+        type: choice
+        options:
+          - dry_run
+          - figshare
+          - osf
+          - both
+      figshare_article_id:
+        description: "Existing Figshare article id to update. Leave empty to create a new draft."
+        required: false
+        type: string
+      osf_node_id:
+        description: "Existing OSF node id to update. Leave empty to create a new node."
+        required: false
+        type: string
+      external_url:
+        description: "Optional DOI, release URL, or public landing page to reference."
+        required: false
+        type: string
+
+permissions:
+  contents: read
+
+concurrency:
+  group: external-sync-${{ github.repository }}
+  cancel-in-progress: false
+
+jobs:
+  sync:
+    runs-on: ubuntu-latest
+    env:
+      SYNC_MODE: ${{ inputs.sync_mode }}
+      FIGSHARE_ARTICLE_ID: ${{ inputs.figshare_article_id }}
+      OSF_NODE_ID: ${{ inputs.osf_node_id }}
+      EXTERNAL_URL: ${{ inputs.external_url }}
+      FIGSHARE_TOKEN: ${{ secrets.FIGSHARE_TOKEN }}
+      OSF_TOKEN: ${{ secrets.OSF_TOKEN }}
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Resolve repository metadata
+        id: meta
+        shell: bash
+        run: |
+          set -euo pipefail
+
+          title="${GITHUB_REPOSITORY##*/}"
+          doi=""
+          version="${GITHUB_REF_NAME:-manual}"
+
+          if [ -f CITATION.cff ]; then
+            parsed_title="$(sed -n 's/^title:[[:space:]]*//p' CITATION.cff | head -n 1 | sed 's/^"//; s/"$//')"
+            parsed_doi="$(sed -n 's/^doi:[[:space:]]*//p' CITATION.cff | head -n 1 | sed 's/^"//; s/"$//')"
+            parsed_version="$(sed -n 's/^version:[[:space:]]*//p' CITATION.cff | head -n 1 | sed 's/^"//; s/"$//')"
+
+            if [ -n "$parsed_title" ]; then title="$parsed_title"; fi
+            if [ -n "$parsed_doi" ]; then doi="$parsed_doi"; fi
+            if [ -n "$parsed_version" ]; then version="$parsed_version"; fi
+          fi
+
+          reference_url="${EXTERNAL_URL:-}"
+          if [ -z "$reference_url" ] && [ -n "$doi" ]; then
+            reference_url="https://doi.org/$doi"
+          fi
+          if [ -z "$reference_url" ]; then
+            reference_url="https://github.com/${GITHUB_REPOSITORY}"
+          fi
+
+          {
+            echo "title=$title"
+            echo "doi=$doi"
+            echo "version=$version"
+            echo "reference_url=$reference_url"
+          } >> "$GITHUB_OUTPUT"
+
+      - name: Dry-run summary
+        if: ${{ env.SYNC_MODE == 'dry_run' }}
+        shell: bash
+        run: |
+          {
+            echo "## External sync dry run"
+            echo "- Repository: \`${{ github.repository }}\`"
+            echo "- Title: \`${{ steps.meta.outputs.title }}\`"
+            echo "- DOI: \`${{ steps.meta.outputs.doi || 'missing' }}\`"
+            echo "- Version: \`${{ steps.meta.outputs.version }}\`"
+            echo "- Reference URL: ${{ steps.meta.outputs.reference_url }}"
+            echo "- Figshare token present: ${{ env.FIGSHARE_TOKEN != '' }}"
+            echo "- OSF token present: ${{ env.OSF_TOKEN != '' }}"
+          } >> "$GITHUB_STEP_SUMMARY"
+
+      - name: Sync to Figshare
+        if: ${{ env.SYNC_MODE == 'figshare' || env.SYNC_MODE == 'both' }}
+        shell: bash
+        run: |
+          set -euo pipefail
+
+          if [ -z "$FIGSHARE_TOKEN" ]; then
+            echo "FIGSHARE_TOKEN is required for figshare or both modes." >&2
+            exit 1
+          fi
+
+          python3 <<'PY'
+          import json
+          import os
+          import urllib.error
+          import urllib.request
+
+          token = os.environ["FIGSHARE_TOKEN"]
+          article_id = os.environ.get("FIGSHARE_ARTICLE_ID", "").strip()
+          title = os.environ["TITLE"]
+          reference_url = os.environ["REFERENCE_URL"]
+          payload = {
+              "title": title,
+              "description": f"Manual external sync from {reference_url}",
+              "references": [reference_url],
+              "tags": ["terra", "fractal-metascience", "open-science"],
+          }
+
+          def request(url, method, body=None):
+              data = None if body is None else json.dumps(body).encode("utf-8")
+              req = urllib.request.Request(
+                  url,
+                  data=data,
+                  method=method,
+                  headers={
+                      "Authorization": f"token {token}",
+                      "Content-Type": "application/json",
+                  },
+              )
+              try:
+                  with urllib.request.urlopen(req, timeout=60) as resp:
+                      return resp.status, resp.read().decode("utf-8")
+              except urllib.error.HTTPError as e:
+                  detail = e.read().decode("utf-8", errors="replace")
+                  raise SystemExit(f"Figshare HTTP {e.code}: {detail}")
+
+          if article_id:
+              status, _ = request(f"https://api.figshare.com/v2/account/articles/{article_id}", "PUT", payload)
+              print(f"Updated Figshare article {article_id} (HTTP {status})")
+          else:
+              status, text = request("https://api.figshare.com/v2/account/articles", "POST", payload)
+              print(f"Created Figshare draft (HTTP {status}): {text}")
+          PY
+        env:
+          TITLE: ${{ steps.meta.outputs.title }}
+          REFERENCE_URL: ${{ steps.meta.outputs.reference_url }}
+
+      - name: Sync to OSF
+        if: ${{ env.SYNC_MODE == 'osf' || env.SYNC_MODE == 'both' }}
+        shell: bash
+        run: |
+          set -euo pipefail
+
+          if [ -z "$OSF_TOKEN" ]; then
+            echo "OSF_TOKEN is required for osf or both modes." >&2
+            exit 1
+          fi
+
+          python3 <<'PY'
+          import json
+          import os
+          import urllib.error
+          import urllib.request
+
+          token = os.environ["OSF_TOKEN"]
+          node_id = os.environ.get("OSF_NODE_ID", "").strip()
+          title = os.environ["TITLE"]
+          reference_url = os.environ["REFERENCE_URL"]
+          payload = {
+              "data": {
+                  "type": "nodes",
+                  "attributes": {
+                      "title": title,
+                      "category": "project",
+                      "description": f"Manual external sync from {reference_url}",
+                      "public": True,
+                  },
+              }
+          }
+
+          def request(url, method, body=None):
+              data = None if body is None else json.dumps(body).encode("utf-8")
+              req = urllib.request.Request(
+                  url,
+                  data=data,
+                  method=method,
+                  headers={
+                      "Authorization": f"Bearer {token}",
+                      "Content-Type": "application/vnd.api+json",
+                  },
+              )
+              try:
+                  with urllib.request.urlopen(req, timeout=60) as resp:
+                      return resp.status, resp.read().decode("utf-8")
+              except urllib.error.HTTPError as e:
+                  detail = e.read().decode("utf-8", errors="replace")
+                  raise SystemExit(f"OSF HTTP {e.code}: {detail}")
+
+          if node_id:
+              status, _ = request(f"https://api.osf.io/v2/nodes/{node_id}/", "PATCH", payload)
+              print(f"Updated OSF node {node_id} (HTTP {status})")
+          else:
+              status, text = request("https://api.osf.io/v2/nodes/", "POST", payload)
+              print(f"Created OSF node (HTTP {status}): {text}")
+          PY
+        env:
+          TITLE: ${{ steps.meta.outputs.title }}
+          REFERENCE_URL: ${{ steps.meta.outputs.reference_url }}
+
+      - name: Summary
+        if: ${{ env.SYNC_MODE != 'dry_run' }}
+        shell: bash
+        run: |
+          {
+            echo "## External sync"
+            echo "- Repository: \`${{ github.repository }}\`"
+            echo "- Mode: \`${{ env.SYNC_MODE }}\`"
+            echo "- Title: \`${{ steps.meta.outputs.title }}\`"
+            echo "- DOI: \`${{ steps.meta.outputs.doi || 'missing' }}\`"
+            echo "- Reference URL: ${{ steps.meta.outputs.reference_url }}"
+          } >> "$GITHUB_STEP_SUMMARY"
+
