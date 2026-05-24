@@ -1,17 +1,86 @@
-name: Terra Audit
+name: terra-audit
 
 on:
   workflow_dispatch:
-  push:
-    branches: [main]
+    inputs:
+      fail_on_missing:
+        description: "Fail when core files are missing"
+        required: false
+        default: false
+        type: boolean
+      fail_on_mojibake:
+        description: "Fail when mojibake markers are detected"
+        required: false
+        default: false
+        type: boolean
+
+permissions:
+  contents: read
+
+concurrency:
+  group: terra-audit-${{ github.repository }}
+  cancel-in-progress: false
 
 jobs:
   audit:
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v4
-      - name: Check core repository files
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Run Terra audit
+        shell: bash
+        env:
+          FAIL_ON_MISSING: ${{ inputs.fail_on_missing }}
+          FAIL_ON_MOJIBAKE: ${{ inputs.fail_on_mojibake }}
         run: |
-          test -f README.md
-          test -f CITATION.cff
-          echo "Basic Terra audit checks passed."
+          set -euo pipefail
+
+          missing=0
+          mojibake=0
+
+          echo "## Terra audit" >> "$GITHUB_STEP_SUMMARY"
+          echo "- Repository: \`${{ github.repository }}\`" >> "$GITHUB_STEP_SUMMARY"
+
+          check_one() {
+            local label="$1"
+            shift
+            for file in "$@"; do
+              if [ -f "$file" ]; then
+                echo "- $label: YES ($file)" >> "$GITHUB_STEP_SUMMARY"
+                return 0
+              fi
+            done
+            echo "- $label: NO" >> "$GITHUB_STEP_SUMMARY"
+            missing=1
+            return 1
+          }
+
+          check_one "README" "README.md" || true
+          check_one "CITATION" "CITATION.cff" || true
+          check_one "LIVING_INDEX" "LIVING_INDEX.md" || true
+          check_one "CHANGELOG" "CHANGELOG.md" || true
+          check_one "LICENSE" "LICENSE" "LICENSE.md" || true
+          check_one "SECURITY" "SECURITY.md" ".github/SECURITY.md" || true
+
+          if command -v rg >/dev/null 2>&1; then
+            if rg -n --glob '*.md' --glob '*.cff' --glob '*.yml' --glob '*.yaml' 'Ð|Ñ|�' . > terra-mojibake-hits.txt; then
+              mojibake=1
+              {
+                echo ""
+                echo "### Mojibake hot spots"
+                head -n 40 terra-mojibake-hits.txt
+              } >> "$GITHUB_STEP_SUMMARY"
+            fi
+          fi
+
+          if [ "$missing" -ne 0 ] && [ "${FAIL_ON_MISSING}" = "true" ]; then
+            echo "Missing required Terra surface." >&2
+            exit 1
+          fi
+
+          if [ "$mojibake" -ne 0 ] && [ "${FAIL_ON_MOJIBAKE}" = "true" ]; then
+            echo "Mojibake detected." >&2
+            exit 1
+          fi
+
