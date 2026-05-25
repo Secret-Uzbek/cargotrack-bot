@@ -1,4 +1,4 @@
-name: zenodo-release
+﻿name: zenodo-release
 
 on:
   workflow_dispatch:
@@ -27,6 +27,7 @@ jobs:
         uses: actions/checkout@v4
         with:
           fetch-depth: 0
+          token: ${{ secrets.GITHUB || secrets.GHP_TOKEN || github.token }}
 
       - name: Resolve metadata
         id: meta
@@ -63,6 +64,7 @@ jobs:
         shell: bash
         env:
           DOI: ${{ steps.meta.outputs.doi }}
+          PUSH_TOKEN: ${{ secrets.GITHUB || secrets.GHP_TOKEN || github.token }}
           VERSION: ${{ steps.meta.outputs.version }}
           TODAY: ${{ steps.meta.outputs.today }}
           REPOSITORY_CODE: https://github.com/${{ github.repository }}
@@ -100,10 +102,12 @@ jobs:
         shell: bash
         env:
           DOI: ${{ steps.meta.outputs.doi }}
+          PUSH_TOKEN: ${{ secrets.GITHUB || secrets.GHP_TOKEN || github.token }}
         run: |
           set -euo pipefail
           git config user.name "github-actions[bot]"
           git config user.email "github-actions[bot]@users.noreply.github.com"
+          git remote set-url origin "https://x-access-token:${PUSH_TOKEN}@github.com/${GITHUB_REPOSITORY}.git"
           git add CITATION.cff
           if ! git diff --staged --quiet; then
             git commit -m "chore: sync CITATION.cff with Zenodo DOI ${DOI}"

@@ -1,4 +1,4 @@
-name: figshare-osf-sync
+﻿name: figshare-osf-sync
 
 on:
   workflow_dispatch:
@@ -41,8 +41,8 @@ jobs:
       FIGSHARE_ARTICLE_ID: ${{ inputs.figshare_article_id }}
       OSF_NODE_ID: ${{ inputs.osf_node_id }}
       EXTERNAL_URL: ${{ inputs.external_url }}
-      FIGSHARE_TOKEN: ${{ secrets.FIGSHARE_TOKEN }}
-      OSF_TOKEN: ${{ secrets.OSF_TOKEN }}
+      FIGSHARE_TOKEN: ${{ secrets.FIGSHARE_SYNC_TOKEN || secrets.FIGSHARE_TOKEN }}
+      OSF_TOKEN: ${{ secrets.OSF_SYNC_TOKEN || secrets.OSF_TOKEN }}
     steps:
       - name: Checkout
         uses: actions/checkout@v4
