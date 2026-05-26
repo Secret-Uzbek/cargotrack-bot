@@ -63,15 +63,44 @@ jobs:
           check_one "LICENSE" "LICENSE" "LICENSE.md" || true
           check_one "SECURITY" "SECURITY.md" ".github/SECURITY.md" || true
 
-          if command -v rg >/dev/null 2>&1; then
-            if rg -n --glob '*.md' --glob '*.cff' --glob '*.yml' --glob '*.yaml' 'Ð|Ñ|�' . > terra-mojibake-hits.txt; then
-              mojibake=1
-              {
-                echo ""
-                echo "### Mojibake hot spots"
-                head -n 40 terra-mojibake-hits.txt
-              } >> "$GITHUB_STEP_SUMMARY"
-            fi
+          python3 - <<'PY'
+          from pathlib import Path
+          import re
+
+          marker_re = re.compile("|".join([
+              "\u00D0.",
+              "\u00D1.",
+              "\uFFFD",
+          ]))
+          hits = []
+          for path in Path('.').rglob('*'):
+              if not path.is_file():
+                  continue
+              if '.git' in path.parts:
+                  continue
+              if path.name == 'terra-audit.yml' and '.github' in path.parts:
+                  continue
+              if path.suffix.lower() not in {'.md', '.cff', '.yml', '.yaml'}:
+                  continue
+              try:
+                  text = path.read_text(encoding='utf-8', errors='replace')
+              except Exception:
+                  continue
+              for idx, line in enumerate(text.splitlines(), start=1):
+                  if marker_re.search(line):
+                      hits.append(f"{path.as_posix()}:{idx}:{line}")
+          Path('terra-mojibake-hits.txt').write_text("
+".join(hits) + ("
+" if hits else ""), encoding='utf-8')
+          raise SystemExit(0 if hits else 1)
+          PY
+          if [ -s terra-mojibake-hits.txt ]; then
+            mojibake=1
+            {
+              echo ""
+              echo "### Mojibake hot spots"
+              head -n 40 terra-mojibake-hits.txt
+            } >> "$GITHUB_STEP_SUMMARY"
           fi
 
           if [ "$missing" -ne 0 ] && [ "${FAIL_ON_MISSING}" = "true" ]; then
