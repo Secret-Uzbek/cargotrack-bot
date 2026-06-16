@@ -1,0 +1,15 @@
+name = "fsr-hub"
+main = "worker.js"
+compatibility_date = "2026-02-01"
+account_id = "c6b63a2d52d28f1d47ba7c63e4a00d9e"
+
+[vars]
+VERSION = "1.0.0"
+
+# Secrets (set via: wrangler secret put TG_TOKEN)
+# TG_TOKEN = your Telegram bot token
+
+[[d1_databases]]
+binding = "DB"
+database_name = "fsr-db"
+database_id = "REPLACE_AFTER_wrangler_d1_create"
