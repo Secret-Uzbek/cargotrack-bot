@@ -8,7 +8,7 @@
 
 Terra Ecosystem builds **ethical educational technologies** that prioritize:
 
-1. **Г°ВџВ‘В¶ Child Safety First** ГўВЂВ” Every contribution must protect children's rights and wellbeing
+1. **Г°ВџВ‘¶ Child Safety First** ГўВЂВ” Every contribution must protect children's rights and wellbeing
 2. **Г°ВџВЊВЌ Educational Freedom** ГўВЂВ” Open access to knowledge for all people
 3. **ГўВљВ–ГЇВёВЏ Ethical Technology** ГўВЂВ” AI and code that serves humanity, not exploits it
 4. **Г°ВџВ¤Вќ Community Collaboration** ГўВЂВ” Together we build planetary-scale solutions
@@ -61,7 +61,7 @@ Key principles:
 
 ---
 
-## Г°ВџВ”В§ HOW TO CONTRIBUTE
+## Г°ВџВ”§ HOW TO CONTRIBUTE
 
 ### Types of Contributions
 
@@ -69,7 +69,7 @@ Key principles:
 |------|-------------|---------|
 | Г°ВџВ“Вќ Documentation | Improve clarity, fix typos, add translations | Fix grammar in LICENSE.md |
 | Г°ВџВђВ› Bug Reports | Report issues with license text or structure | "Section 3.2 is unclear" |
-| Г°ВџВ’ВЎ Feature Requests | Suggest new sections or improvements | "Add AI-specific clause" |
+| Г°ВџВ’! Feature Requests | Suggest new sections or improvements | "Add AI-specific clause" |
 | ГўВљВ–ГЇВёВЏ Legal Review | Help validate compliance with local laws | "GDPR Article 8 needs update" |
 | Г°ВџВЊВЌ Localization | Translate documents to your language | Russian, Uzbek, Spanish versions |
 
@@ -124,7 +124,7 @@ Key principles:
 
 ---
 
-## Г°ВџВ›ВЎГЇВёВЏ SECURITY
+## Г°ВџВ›!ГЇВёВЏ SECURITY
 
 To report security vulnerabilities, see **[SECURITY.md](./SECURITY.md)**.
 
@@ -153,4 +153,4 @@ Your work helps protect children and build ethical technology for the future.
 
 ---
 
-*Г‚В© 2025 Abdurashid Abdukarimov. Terra Ecosystem.*
+*Г‚© 2025 Abdurashid Abdukarimov. Terra Ecosystem.*

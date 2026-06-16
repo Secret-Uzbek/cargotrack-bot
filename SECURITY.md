@@ -41,8 +41,8 @@ We take security seriously, especially when it affects children's safety.
 | Child data protection | Г°ВџВ”Вґ Critical |
 | Authentication systems | Г°ВџВ”Вґ Critical |
 | API endpoints | Г°ВџВџВ  High |
-| Documentation integrity | Г°ВџВџВЎ Medium |
-| License enforcement | Г°ВџВџВЎ Medium |
+| Documentation integrity | Г°ВџВџ! Medium |
+| License enforcement | Г°ВџВџ! Medium |
 
 ### Out of Scope
 
@@ -67,12 +67,12 @@ We take security seriously, especially when it affects children's safety.
 |-------|---------------|-------------|
 | Г°ВџВ”Вґ Critical | 24 hours | Active exploitation, child safety risk |
 | Г°ВџВџВ  High | 7 days | Potential data exposure, security bypass |
-| Г°ВџВџВЎ Medium | 30 days | Limited impact, requires specific conditions |
+| Г°ВџВџ! Medium | 30 days | Limited impact, requires specific conditions |
 | Г°ВџВџВў Low | 90 days | Minimal impact, informational |
 
 ---
 
-## Г°ВџВ›ВЎГЇВёВЏ CHILD SAFETY PRIORITY
+## Г°ВџВ›!ГЇВёВЏ CHILD SAFETY PRIORITY
 
 Any vulnerability that could affect children's safety receives:
 
@@ -113,4 +113,4 @@ For cross-border security issues, we cooperate with:
 
 ---
 
-*Г‚В© 2025 Abdurashid Abdukarimov. Terra Ecosystem.*
+*Г‚© 2025 Abdurashid Abdukarimov. Terra Ecosystem.*

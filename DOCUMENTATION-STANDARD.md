@@ -1,21 +1,21 @@
-# рџ“ќ DOCUMENTATION STANDARD
+# 📝 DOCUMENTATION STANDARD
 
 **Terra Ecosystem Documentation Guidelines**
 
 ---
 
-## рџЋЇ PURPOSE
+## 🎯 PURPOSE
 
 This standard ensures all Terra Ecosystem documentation is:
 
-- **Consistent** вЂ” same structure across all repositories
-- **Accessible** вЂ” understandable by developers, educators, and parents
-- **Multilingual** вЂ” ready for translation into RU, UZ, DE and other languages
-- **Child-Safe** вЂ” never contains content harmful to children
+- **Consistent** — same structure across all repositories
+- **Accessible** — understandable by developers, educators, and parents
+- **Multilingual** — ready for translation into RU, UZ, DE and other languages
+- **Child-Safe** — never contains content harmful to children
 
 ---
 
-## рџ“Ѓ REQUIRED FILES PER REPOSITORY
+## 📁 REQUIRED FILES PER REPOSITORY
 
 Every Terra Ecosystem repository **MUST** contain:
 
@@ -38,22 +38,22 @@ Every Terra Ecosystem repository **MUST** contain:
 # Project Name
 > One-line description
 
-## рџЋЇ Overview
+## 🎯 Overview
 What this project does and why it exists.
 
-## рџљЂ Quick Start
+## 🚀 Quick Start
 Minimal steps to get running.
 
-## рџ“љ Documentation
+## 📚 Documentation
 Links to full docs.
 
 ## рџ¤ќ Contributing
 Link to CONTRIBUTING.md
 
-## рџ“њ License
+## 📜 License
 License name + link to LICENSE.md
 
-## рџ”— Part of FMP Ecosystem
+## 🔗 Part of FMP Ecosystem
 Link to FMP-CENTRAL-REPO
 ```
 
@@ -65,28 +65,28 @@ Link to FMP-CENTRAL-REPO
 
 - **Primary:** English
 - **Secondary:** Russian, Uzbek, German
-- Use **simple, clear sentences** вЂ” max 20 words per sentence
+- Use **simple, clear sentences** — max 20 words per sentence
 - Avoid jargon without explanation
 - Spell out acronyms on first use: FMP (Fractal Metascience Paradigm)
 
 ### Tone
 
 - Professional but approachable
-- Inclusive вЂ” no gendered language
+- Inclusive — no gendered language
 - Respectful of all cultures and religions
-- Child-safe вЂ” always
+- Child-safe — always
 
 ### Formatting
 
 ```
-# H1 вЂ” Document title only (once per file)
-## H2 вЂ” Major sections
-### H3 вЂ” Subsections
+# H1 — Document title only (once per file)
+## H2 — Major sections
+### H3 — Subsections
 
-**Bold** вЂ” for key terms, warnings
-*Italic* вЂ” for titles, foreign words
-Code вЂ” for commands, filenames, variables
-> Blockquote вЂ” for important notes
+**Bold** — for key terms, warnings
+*Italic* — for titles, foreign words
+Code — for commands, filenames, variables
+> Blockquote — for important notes
 ```
 
 ---
@@ -95,9 +95,9 @@ Code вЂ” for commands, filenames, variables
 
 All documents follow **Semantic Versioning** (MAJOR.MINOR.PATCH):
 
-- **PATCH** вЂ” Typo fixes, clarifications
-- **MINOR** вЂ” New sections, additions
-- **MAJOR** вЂ” Breaking changes, restructuring
+- **PATCH** — Typo fixes, clarifications
+- **MINOR** — New sections, additions
+- **MAJOR** — Breaking changes, restructuring
 
 ### Changelog Entry Format
 
@@ -116,7 +116,7 @@ All documents follow **Semantic Versioning** (MAJOR.MINOR.PATCH):
 
 ---
 
-## рџЊЌ MULTILINGUAL DOCUMENTATION
+## 🌍 MULTILINGUAL DOCUMENTATION
 
 ### Translation Structure
 
@@ -132,12 +132,12 @@ docs/
 
 1. Translate **meaning**, not word-for-word
 2. Preserve technical terms in English + local language
-3. Keep emoji вЂ” they are universal
+3. Keep emoji — they are universal
 4. Mark machine-translated files with [MT] prefix until reviewed
 
 ---
 
-## рџ”— LINKING STANDARD
+## 🔗 LINKING STANDARD
 
 **Internal links:**
 ```markdown
@@ -152,7 +152,7 @@ docs/
 
 ---
 
-## рџ“Љ CITATION.cff TEMPLATE
+## 📊 CITATION.cff TEMPLATE
 
 ```yaml
 cff-version: 1.2.0
@@ -183,5 +183,5 @@ version: "1.0.0"
 
 ---
 
-*В© 2025 Abdurashid Abdukarimov. Terra Ecosystem.*
-*Version: 1.0.0 вЂ” March 2026*
+*© 2025 Abdurashid Abdukarimov. Terra Ecosystem.*
+*Version: 1.0.0 — March 2026*

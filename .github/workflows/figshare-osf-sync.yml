@@ -1,4 +1,4 @@
-﻿name: figshare-osf-sync
+name: figshare-osf-sync
 
 on:
   workflow_dispatch:

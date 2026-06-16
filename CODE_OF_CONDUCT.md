@@ -18,7 +18,7 @@ We pledge to make participation in Terra Ecosystem a **harassment-free experienc
 
 ---
 
-## Г°ВџВ‘В¶ CHILD SAFETY FIRST
+## Г°ВџВ‘¶ CHILD SAFETY FIRST
 
 ### Absolute Rules
 
@@ -73,7 +73,7 @@ We pledge to make participation in Terra Ecosystem a **harassment-free experienc
 
 | Level | Action | Description |
 |-------|--------|-------------|
-| Г°ВџВџВЎ Warning | Private notice | First minor violation |
+| Г°ВџВџ! Warning | Private notice | First minor violation |
 | Г°ВџВџВ  Temporary Ban | 30-day suspension | Repeated or serious violation |
 | Г°ВџВ”Вґ Permanent Ban | Forever | Severe violation, especially child safety |
 | ГўВљВ« Legal Action | Court/law enforcement | Criminal behavior, exploitation |
@@ -143,5 +143,5 @@ Thank you for helping make Terra Ecosystem a **safe, inclusive, and ethical** co
 
 ---
 
-*Г‚В© 2025 Abdurashid Abdukarimov. Terra Ecosystem.*
+*Г‚© 2025 Abdurashid Abdukarimov. Terra Ecosystem.*
 *Based on Contributor Covenant 2.1 + Terra Public License v1.0*

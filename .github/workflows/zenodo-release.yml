@@ -1,4 +1,4 @@
-﻿name: zenodo-release
+name: zenodo-release
 
 on:
   workflow_dispatch:

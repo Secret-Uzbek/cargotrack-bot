@@ -48,7 +48,7 @@ Personal assistants for child development
 Non-profit educational initiatives
 Charitable educational programs
 Government educational projects
-Open source educational projectsГ°ВџВ”В§ Development and Modification
+Open source educational projectsГ°ВџВ”§ Development and Modification
 Permitted when complying with ethical standards:
 Г°ВџВЏВ—ГЇВёВЏ Technical Improvement:
 Bug fixes and performance improvements
@@ -68,7 +68,7 @@ Experiments with ethical AI technologies
 ГўВљВ ГЇВёВЏ RESTRICTIONS AND OBLIGATIONS
 Г°ВџВљВ« Prohibited Use
 Strictly prohibited under any circumstances:
-Г°ВџВ’В° Child Exploitation:
+Г°ВџВ’° Child Exploitation:
 Collecting children's data for commercial sale
 Creating addictive/manipulative game mechanics
 Using children's content without parental consent
@@ -90,7 +90,7 @@ Monetizing children's behavioral data
 Hidden or deceptive practices
 Г°ВџВ“В‹ Mandatory Requirements
 For any use, you must:
-Г°ВџВ›ВЎГЇВёВЏ Comply with Child Safety Standards:
+Г°ВџВ›!ГЇВёВЏ Comply with Child Safety Standards:
 Requirements:
 GDPR Article 8 compliance (child consent)
 COPPA compliance (parental consent)
@@ -101,7 +101,7 @@ Public privacy policy with detailed description of children's data processing
 Regular security audits of children's components
 Incident response plan for child safety
 Public reporting on ethical standards compliance
-Г°ВџВ‘ВЁГўВЂВЌГ°ВџВ‘В©ГўВЂВЌГ°ВџВ‘В§ГўВЂВЌГ°ВџВ‘В¦ Parental Rights:
+Г°ВџВ‘ВЁГўВЂВЌГ°ВџВ‘©ГўВЂВЌГ°ВџВ‘§ГўВЂВЌГ°ВџВ‘В¦ Parental Rights:
 Provide parents full control over children's data
 Clear and understandable parent dashboard interfaces
 Opt-in consent for all features affecting children
@@ -113,7 +113,7 @@ Apply via a.abdukarimov@fractal-metascience.org
 Technical expertise of planned use
 Ethical validation via Gefunden Protocol
 Legal review for child safety standards compliance
-Г°ВџВ’В° Licensing Structure:
+Г°ВџВ’° Licensing Structure:
 Startup_License:
 Revenue_Threshold: "< $1M ARR"
 Fee: "$1,000/year"
@@ -187,7 +187,7 @@ Bounty program for serious violations ($1,000-$10,000)
 Child safety priority for violations affecting children
 Г°ВџВ“Вќ Enforcement Actions
 Graduated Response:
-Г°ВџВџВЎ Primary Notice (Warning):
+Г°ВџВџ! Primary Notice (Warning):
 Official violation notice
 30-day period to correct
 Technical assistance for compliance
@@ -207,7 +207,7 @@ Referral to law enforcement for threats to children
 International cooperation via Interpol
 Notification of child protection agencies
 Public safety warnings
-Г°ВџВ’В° Fines and Damages
+Г°ВџВ’° Fines and Damages
 Financial Penalties:
 Individual_Violations:
 Minor_Non_Commercial: "$1,000 - $5,000"
@@ -329,7 +329,7 @@ Public_Results: "Summary public, details confidential"
 Г°ВџВЊВџ CONCLUSION
 Terra Public License v1.0 represents a new paradigm in educational technology licensing, where child protection is built into the legal structure of the license itself.
 Г°ВџВЋВЇ Core Principles of TPL-1.0:
-Г°ВџВ‘В¶ Child Safety First ГўВЂВ” child safety is the priority over any other considerations
+Г°ВџВ‘¶ Child Safety First ГўВЂВ” child safety is the priority over any other considerations
 Г°ВџВЊВЌ Educational Freedom ГўВЂВ” maximum freedom for legitimate educational use
 ГўВљВ–ГЇВёВЏ Ethical Technology ГўВЂВ” mandatory ethical standards for all users
 Г°ВџВ¤Вќ Community Collaboration ГўВЂВ” encouraging open source collaboration for children's benefit
@@ -338,7 +338,7 @@ Terra Public License v1.0 represents a new paradigm in educational technology li
 Terra Public License is not just a legal document ГўВЂВ” it is a manifesto for creating technologies that truly serve children's best interests.
 If you are:
 Г°ВџВЋВ“ Educational Institution ГўВЂВ” get full freedom of use
-Г°ВџВ‘ВЁГўВЂВЌГ°ВџВ‘В©ГўВЂВЌГ°ВџВ‘В§ГўВЂВЌГ°ВџВ‘В¦ Parent ГўВЂВ” get confidence in your children's protection
+Г°ВџВ‘ВЁГўВЂВЌГ°ВџВ‘©ГўВЂВЌГ°ВџВ‘§ГўВЂВЌГ°ВџВ‘В¦ Parent ГўВЂВ” get confidence in your children's protection
 Г°ВџВ’В» Developer ГўВЂВ” join the ethical tech movement
 Г°ВџВЏВў Company ГўВЂВ” get commercial license with child safety guarantees
 ГўВљВ–ГЇВёВЏ Lawyer ГўВЂВ” help us improve the license for better child protection
@@ -348,7 +348,7 @@ Child Safety: a.abdukarimov@fractal-metascience.org
 Legal: a.abdukarimov@fractal-metascience.org
 Community: a.abdukarimov@fractal-metascience.org
 Г°ВџВ“Вњ Terra Public License v1.0 ГўВЂВ” Protecting Children Through Ethical Technology Licensing Г°ВџВЊВЌГўВњВЁ
-Г‚В© 2025 Abdurashid Abdukarimov. Terra Public License v1.0.
+Г‚© 2025 Abdurashid Abdukarimov. Terra Public License v1.0.
 This license was developed with love and dedication to protect children worldwide. Г°ВџВ’Вќ
 Last Updated: July 16, 2025
 Next Review: January 16, 2026
