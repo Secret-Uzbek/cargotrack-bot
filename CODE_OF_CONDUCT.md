@@ -1,10 +1,10 @@
-# Г°ВџВ¤Вќ CODE OF CONDUCT
+# 🤝 CODE OF CONDUCT
 
 **Terra Ecosystem Community Guidelines**
 
 ---
 
-## Г°ВџВЋВЇ OUR PLEDGE
+## 🎯 OUR PLEDGE
 
 We pledge to make participation in Terra Ecosystem a **harassment-free experience** for everyone, regardless of:
 
@@ -18,7 +18,7 @@ We pledge to make participation in Terra Ecosystem a **harassment-free experienc
 
 ---
 
-## Г°ВџВ‘¶ CHILD SAFETY FIRST
+## 👶 CHILD SAFETY FIRST
 
 ### Absolute Rules
 
@@ -35,17 +35,17 @@ We pledge to make participation in Terra Ecosystem a **harassment-free experienc
 
 ---
 
-## ГўВњВ… EXPECTED BEHAVIOR
+## ✅ EXPECTED BEHAVIOR
 
 - Be **respectful** and inclusive in all communications
-- Be **collaborative** ГўВЂВ” we build together
+- Be **collaborative** — we build together
 - Be **transparent** about your intentions and affiliations
 - Be **accountable** for your contributions and their impact
 - Be **patient** with newcomers and different perspectives
 
 ---
 
-## Г°ВџВљВ« UNACCEPTABLE BEHAVIOR
+## 🚫 UNACCEPTABLE BEHAVIOR
 
 | Category | Examples |
 |----------|----------|
@@ -58,7 +58,7 @@ We pledge to make participation in Terra Ecosystem a **harassment-free experienc
 
 ---
 
-## Г°ВџВ“ВЉ ENFORCEMENT
+## 📊 ENFORCEMENT
 
 ### Reporting Violations
 
@@ -73,10 +73,10 @@ We pledge to make participation in Terra Ecosystem a **harassment-free experienc
 
 | Level | Action | Description |
 |-------|--------|-------------|
-| Г°ВџВџ! Warning | Private notice | First minor violation |
-| Г°ВџВџВ  Temporary Ban | 30-day suspension | Repeated or serious violation |
-| Г°ВџВ”Вґ Permanent Ban | Forever | Severe violation, especially child safety |
-| ГўВљВ« Legal Action | Court/law enforcement | Criminal behavior, exploitation |
+| 🟡 Warning | Private notice | First minor violation |
+| 🟠 Temporary Ban | 30-day suspension | Repeated or serious violation |
+| 🔴 Permanent Ban | Forever | Severe violation, especially child safety |
+| ⚫ Legal Action | Court/law enforcement | Criminal behavior, exploitation |
 
 ### Appeal Process
 
@@ -87,14 +87,14 @@ Banned members may appeal after 90 days by emailing a.abdukarimov@fractal-metasc
 
 ---
 
-## Г°ВџВЊВЌ CULTURAL RESPECT
+## 🌍 CULTURAL RESPECT
 
 Terra Ecosystem is global. We respect:
 
-- **Religious diversity** ГўВЂВ” Islamic, Christian, Buddhist, Hindu, and all other traditions
-- **Cultural traditions** ГўВЂВ” Local customs, languages, and practices
-- **Educational approaches** ГўВЂВ” Different pedagogical philosophies
-- **Family structures** ГўВЂВ” Various family models and parenting styles
+- **Religious diversity** — Islamic, Christian, Buddhist, Hindu, and all other traditions
+- **Cultural traditions** — Local customs, languages, and practices
+- **Educational approaches** — Different pedagogical philosophies
+- **Family structures** — Various family models and parenting styles
 
 ### Religious Compatibility
 
@@ -106,14 +106,14 @@ We actively support integration with:
 
 ---
 
-## Г°ВџВ¤В– AI AND TECHNOLOGY ETHICS
+## 🤖 AI AND TECHNOLOGY ETHICS
 
 ### AI Principles
 
-1. **AI serves humans** ГўВЂВ” Never replaces human judgment on child safety
-2. **Transparency** ГўВЂВ” AI decisions must be explainable
-3. **No manipulation** ГўВЂВ” AI must not exploit psychological vulnerabilities
-4. **Human oversight** ГўВЂВ” Critical decisions require human review
+1. **AI serves humans** — Never replaces human judgment on child safety
+2. **Transparency** — AI decisions must be explainable
+3. **No manipulation** — AI must not exploit psychological vulnerabilities
+4. **Human oversight** — Critical decisions require human review
 
 ### Technology Standards
 
@@ -124,7 +124,7 @@ We actively support integration with:
 
 ---
 
-## Г°ВџВ“Вћ CONTACTS
+## 📞 CONTACTS
 
 | Topic | Contact |
 |-------|---------|
@@ -135,13 +135,13 @@ We actively support integration with:
 
 ---
 
-## Г°ВџВЊВџ THANK YOU
+## 🌟 THANK YOU
 
 Thank you for helping make Terra Ecosystem a **safe, inclusive, and ethical** community.
 
-**Together we build technology that serves children and humanity.** Г°ВџВЊВЌГўВњВЁ
+**Together we build technology that serves children and humanity.** 🌍✨
 
 ---
 
-*Г‚© 2025 Abdurashid Abdukarimov. Terra Ecosystem.*
+*© 2025 Abdurashid Abdukarimov. Terra Ecosystem.*
 *Based on Contributor Covenant 2.1 + Terra Public License v1.0*
